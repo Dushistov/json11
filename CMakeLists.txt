@@ -3,15 +3,18 @@ project(json11 VERSION 1.0.0 LANGUAGES CXX)
 
 enable_testing()
 
+add_subdirectory(double-conversion)
+include_directories(double-conversion)
 add_library(json11 json11.cpp)
 target_include_directories(json11 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(json11
   PUBLIC -std=c++11
   PRIVATE -fno-rtti -fno-exceptions -Wall -Wextra -Werror)
+target_link_libraries(json11 double-conversion)
 configure_file("json11.pc.in" "json11.pc" @ONLY)
 
 add_executable(json11_test test.cpp)
-target_link_libraries(json11_test json11)
+target_link_libraries(json11_test json11 double-conversion)
 
 install(TARGETS json11 DESTINATION lib)
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/json11.hpp" DESTINATION include)

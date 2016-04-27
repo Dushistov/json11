@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
     }
 
     const string simple_test =
-        R"({"k1":"v1", "k2":42, "k3":["a",123,true,false,null]})";
+        R"({"k1":"v1", "k2":42.1, "k3":["a",123,true,false,null]})";
 
     string err;
     auto json = Json::parse(simple_test, err);
@@ -151,7 +151,7 @@ int main(int argc, char **argv) {
     // Json literals
     Json obj = Json::object({
         { "k1", "v1" },
-        { "k2", 42.0 },
+        { "k2", 42.1 },
         { "k3", Json::array({ "a", 123.0, true, false, nullptr }) },
     });
 

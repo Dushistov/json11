@@ -26,6 +26,8 @@
 #include <cstdio>
 #include <limits>
 
+#include "double-conversion/double-conversion.h"
+
 namespace json11 {
 
 static const int max_depth = 200;
@@ -47,9 +49,13 @@ static void dump(std::nullptr_t, string &out) {
 
 static void dump(double value, string &out) {
     if (std::isfinite(value)) {
+        const double_conversion::DoubleToStringConverter &dc = double_conversion::DoubleToStringConverter::EcmaScriptConverter();
         char buf[32];
-        snprintf(buf, sizeof buf, "%.17g", value);
-        out += buf;
+        double_conversion::StringBuilder str_builder(buf, sizeof(buf));
+        dc.ToShortest(value, &str_builder);
+//        dc.ToFixed(value, 17, &str_builder);
+//        snprintf(buf, sizeof buf, "%.17g", value);
+        out += str_builder.Finalize();
     } else {
         out += "null";
     }
@@ -608,8 +614,12 @@ struct JsonParser {
             while (in_range(str[i], '0', '9'))
                 i++;
         }
+        using double_conversion::StringToDoubleConverter;
 
-        return std::strtod(str.c_str() + start_pos, nullptr);
+        StringToDoubleConverter double_conv{StringToDoubleConverter::NO_FLAGS, 0., 0., "Infinity", "NaN",};
+        int processed_characters_count;
+        return double_conv.StringToDouble(&str[start_pos], i - start_pos, &processed_characters_count);
+//        return std::strtod(str.c_str() + start_pos, nullptr);
     }
 
     /* expect(str, res)
